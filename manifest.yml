@@ -1,9 +1,9 @@
 modules:
   macro:
-    - key: forge-webhook-trigger-hello-world
+    - key: forge-webhook-trigger-macro
       function: main
-      title: forge-webhook-trigger
-      description: Inserts Hello world!
+      title: Webhook Trigger Macro
+      description: Simple Macro that allows you to create a Macro that triggers a Webhook.
   function:
     - key: main
       handler: index.run
