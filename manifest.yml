@@ -1,0 +1,12 @@
+modules:
+  macro:
+    - key: forge-webhook-trigger-hello-world
+      function: main
+      title: forge-webhook-trigger
+      description: Inserts Hello world!
+  function:
+    - key: main
+      handler: index.run
+app:
+  id: 'ari:cloud:ecosystem::app/95cb40c2-6f61-40a8-8214-7a364597bbeb'
+  name: forge-webhook-trigger
