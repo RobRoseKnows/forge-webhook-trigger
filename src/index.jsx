@@ -1,10 +1,7 @@
 import ForgeUI, { render, Fragment, Macro, Text, ConfigForm, TextField, useConfig, useState, TextArea, Select, Option, Button } from "@forge/ui";
-import fetch from 'node-fetch';
+import api from "@forge/api";
 
-const STATE = {
-  INITIAL: 0,
-  SUCCESS: 1
-};
+const {DEBUG_LOGGING} = process.env;
 
 const Config = () => {
 
@@ -21,7 +18,7 @@ const Config = () => {
         placeholder="https://httpbin.org/get"
         isRequired={true} />
       <TextArea
-        label="Webhook Body"
+        label="Webhook Body (only JSON supported)"
         name="webhookBody"
         isMonospaced={true} />
       <Select 
@@ -32,7 +29,7 @@ const Config = () => {
         <Option label="POST" value="POST" />
         <Option label="DELETE" value="DELETE" />
       </Select>
-      <Select 
+      {/* <Select 
         label="Webhook Mode"
         name="webhookMode">
         <Option defaultSelected label="cors" value="cors" />
@@ -54,7 +51,7 @@ const Config = () => {
         <Option defaultSelected label="same-origin" value="same-origin"/>
         <Option label="include" value="include"/>
         <Option label="omit" value="omit"/>
-      </Select>
+      </Select> */}
       <TextArea
         label="Webhook Headers"
         name="webhookHeaders"
@@ -66,9 +63,14 @@ const Config = () => {
 
 const App = () => {
   const config = useConfig();
-  const [ state, setState ] = useState(STATE.INITIAL);
-  const [ error, setError ] = useState(null);
   const [ response, setResponse ] = useState(null);
+
+  async function doWebhook(url, opts) {
+    const fetchResponse = await api.fetch(url, opts);
+    await checkResponse(fetchResponse);
+    const text = JSON.stringify(await fetchResponse.json());
+    setResponse(text);
+  }
 
   const doNeedConfig = () => {
     return (
@@ -78,73 +80,37 @@ const App = () => {
     );
   };
 
-  const doInitial = () => {
-    return (
-      <Fragment>
-        <Button 
-          text={config.buttonText}
-          onClick={() => {
-            setError(null);
-            setResponse(null);
-            fetch(config.webhookURL).then(response => {
-                setState(STATE.SUCCESS);
-                setResponse(response);
-                console.log("Webhook responded.")
-            }).catch(error => {
-                setState(STATE.SUCCESS);
-                setError(error);
-                console.error("Error: Webhook response not ok.", error);
-            });
-          }} 
-        />
-      </Fragment>
-    )
-  };
-
-  const doSuccess = () => {
-    if (error) {
-      return (
-        <Fragment>
-          <Text>**Webhook Errored!** Response:</Text>
-          <Text>{error}</Text>
-          <Button 
-            text="Reset" 
-            onClick={() => {
-                setState(STATE.INITIAL);
-                setError(null);
-                setResponse(null);
-              }}
-          />
-        </Fragment>
-      )
-    }
-
-    return (
-      <Fragment>
-        <Text>**Webhook Successful!** Response:</Text>
-        <Text>{response}</Text>
-        <Button 
-          text="Reset" 
-          onClick={() => {
-              setState(STATE.INITIAL);
-              setError(null);
-              setResponse(null);
-            }}
-        />
-      </Fragment>
-    );
-  };
-
   if (!config) {
     return doNeedConfig();
   }
 
-  switch(state) {
-    case STATE.INITIAL:
-      return doInitial();
-    case STATE.SUCCESS:
-      return doSuccess();
-  }
+  return (
+    <Fragment>
+      <Button 
+        text={config.buttonText}
+        onClick={async () => {await doWebhook(config.webhookURL, {
+          method: config.webhookMethod,
+          headers: JSON.parse(config.webhookHeaders),
+          body: JSON.stringify(config.webhookBody)
+        }); }} />
+        {response && (
+          <Fragment>
+            <Text>**Webhook Successful!**</Text>
+            <Text>```{response}```</Text>
+          </Fragment>
+        )}
+    </Fragment>
+  );
 };
+
+async function checkResponse(response) {
+  if (!response.ok) {
+    const message = `Error from webhook: ${response.status} ${await response.text()}`;
+    console.error(message);
+    throw new Error(message);
+  } else if (DEBUG_LOGGING) {
+    console.debug(`Response from webhook: ${await response.text()}`);
+  }
+}
 
 export const run = render(<Macro app={<App />} config={<Config />}/>);
