@@ -1,6 +1,8 @@
-# Forge Hello World
+# Atlassian Forge Webhook Macro for Confluence
 
-This project contains a Forge app written in Javascript that displays `Hello World!` in a Confluence macro. 
+This project contains a Forge app written in Javascript that displays a configurable 
+webhook button in a Confluence macro. The button can be configured with text, a webhook
+URL, HTTP methods, headers and body.
 
 See [developer.atlassian.com/platform/forge/](https://developer.atlassian.com/platform/forge) for documentation and tutorials explaining Forge.
 
@@ -10,7 +12,10 @@ See [Set up Forge](https://developer.atlassian.com/platform/forge/set-up-forge/)
 
 ## Quick start
 
-- Modify your app by editing the `src/index.jsx` file.
+- Register this app:
+```
+forge register
+```
 
 - Build and deploy your app by running:
 ```
@@ -21,16 +26,6 @@ forge deploy
 ```
 forge install
 ```
-
-- Develop your app by running `forge tunnel` to proxy invocations locally:
-```
-forge tunnel
-```
-
-### Notes
-- Use the `forge deploy` command when you want to persist code changes.
-- Use the `forge install` command when you want to install the app on a new site.
-- Once the app is installed on a site, the site picks up the new app changes you deploy without needing to rerun the install command.
 
 ## Support
 
