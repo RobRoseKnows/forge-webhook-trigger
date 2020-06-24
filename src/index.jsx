@@ -1,28 +1,10 @@
-import ForgeUI, { render, Fragment, Macro, Text, ConfigForm, TextField, useConfig, useState, TextArea, Select, Button } from "@forge/ui";
+import ForgeUI, { render, Fragment, Macro, Text, ConfigForm, TextField, useConfig, useState, TextArea, Select, Option, Button } from "@forge/ui";
+import fetch from 'node-fetch';
 
 const STATE = {
   INITIAL: 0,
   SUCCESS: 1
 };
-
-async function doWebhook(url, method, mode, cache, credentials, headers, redirect, referrerPolicy, body) {
-  const response = await fetch(url, {
-    method: method,
-    mode: mode,
-    cache: cache,
-    credentials: credentials,
-    headers: headers,
-    redirect: redirect,
-    referrerPolicy: referrerPolicy,
-    body: body
-  });
-  
-  if(!response.ok) {
-    throw new Error("Error: Webhook response not ok.");
-  }
-
-  return response.text();
-}
 
 const Config = () => {
 
@@ -87,6 +69,27 @@ const App = () => {
   const [ state, setState ] = useState(STATE.INITIAL);
   const [ error, setError ] = useState(null);
   const [ response, setResponse ] = useState(null);
+  
+  const doWebhook = async (url, method, mode, cache, credentials, headers, redirect, referrerPolicy, body) => {
+    const response = await fetch(url, {
+      method: method,
+      mode: mode,
+      cache: cache,
+      credentials: credentials,
+      headers: headers,
+      redirect: redirect,
+      referrerPolicy: referrerPolicy,
+      body: body
+    });
+    
+    console.log(response.text());
+  
+    if(!response.ok) {
+      throw new Error("Error: Webhook response not ok.");
+    }
+  
+    return response.text();
+  }
 
   const doNeedConfig = () => {
     return (
@@ -116,6 +119,7 @@ const App = () => {
               config.webhookBody).then(response => {
                 setState(STATE.SUCCESS);
                 setResponse(response);
+                console.log("Webhook responded.")
               }).catch(error => {
                 setState(STATE.SUCCESS);
                 setError(error);
