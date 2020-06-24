@@ -20,7 +20,8 @@ const Config = () => {
       <TextArea
         label="Webhook Body (only JSON supported)"
         name="webhookBody"
-        isMonospaced={true} />
+        isMonospaced={true}
+        placeholder="{}" />
       <Select 
         label="Webhook Method"
         name="webhookMethod">
