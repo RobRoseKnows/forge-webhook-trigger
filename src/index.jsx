@@ -69,27 +69,6 @@ const App = () => {
   const [ state, setState ] = useState(STATE.INITIAL);
   const [ error, setError ] = useState(null);
   const [ response, setResponse ] = useState(null);
-  
-  const doWebhook = async (url, method, mode, cache, credentials, headers, redirect, referrerPolicy, body) => {
-    const response = await fetch(url, {
-      method: method,
-      mode: mode,
-      cache: cache,
-      credentials: credentials,
-      headers: headers,
-      redirect: redirect,
-      referrerPolicy: referrerPolicy,
-      body: body
-    });
-    
-    console.log(response.text());
-  
-    if(!response.ok) {
-      throw new Error("Error: Webhook response not ok.");
-    }
-  
-    return response.text();
-  }
 
   const doNeedConfig = () => {
     return (
@@ -107,24 +86,15 @@ const App = () => {
           onClick={() => {
             setError(null);
             setResponse(null);
-            doWebhook(
-              config.webhookURL,
-              config.webhookMethod,
-              config.webhookMode,
-              config.webhookCache,
-              config.webhookCredentials,
-              config.webhookHeaders,
-              config.webhookRedirect,
-              config.webhookReferrerPolicy,
-              config.webhookBody).then(response => {
+            fetch(config.webhookURL).then(response => {
                 setState(STATE.SUCCESS);
                 setResponse(response);
                 console.log("Webhook responded.")
-              }).catch(error => {
+            }).catch(error => {
                 setState(STATE.SUCCESS);
                 setError(error);
                 console.error("Error: Webhook response not ok.", error);
-              });
+            });
           }} 
         />
       </Fragment>
