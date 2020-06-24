@@ -128,7 +128,37 @@ const App = () => {
   };
 
   const doSuccess = () => {
+    if (error) {
+      return (
+        <Fragment>
+          <Text>**Webhook Errored!** Response:</Text>
+          <Text>{error}</Text>
+          <Button 
+            text="Reset" 
+            onClick={() => {
+                setState(STATE.INITIAL);
+                setError(null);
+                setResponse(null);
+              }}
+          />
+        </Fragment>
+      )
+    }
 
+    return (
+      <Fragment>
+        <Text>**Webhook Successful!** Response:</Text>
+        <Text>{response}</Text>
+        <Button 
+          text="Reset" 
+          onClick={() => {
+              setState(STATE.INITIAL);
+              setError(null);
+              setResponse(null);
+            }}
+        />
+      </Fragment>
+    );
   };
 
   if (!config) {
