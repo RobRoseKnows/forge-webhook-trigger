@@ -57,7 +57,7 @@ const Config = () => {
         label="Webhook Headers"
         name="webhookHeaders"
         isMonospaced={true}
-        defaultValue="{'Content-Type': 'application/json'}" />
+        defaultValue='{"Content-Type": "application/json"}' />
     </ConfigForm>
   )
 }
